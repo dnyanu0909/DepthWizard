@@ -422,47 +422,53 @@
   overflow: hidden;
   border: var(--glass-border);
   box-shadow: var(--glass-shadow-lg);
-  display: flex;
-  background: #000;
+  display: block;
+  background: #0d121f;
+  min-height: 480px;
 }
 
-/* Side-by-side split slider layout */
+/* Container query root */
 .compare-slider-wrapper {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 480px;
   overflow: hidden;
   user-select: none;
 }
 
+/* 2D Background (Full viewport behind) */
 .compare-panel-2d {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #101625;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  background: #0d121f;
 }
 
+/* 3D Foreground (Clipped by slider handle) */
 .compare-panel-3d {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
   width: 50%;
-  height: 100%;
-  overflow: hidden;
-  background: #1a2035;
-  border-right: 2px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+  height: 100% !important;
+  overflow: hidden !important;
+  background: #0d121f;
   z-index: 10;
+  border-right: 3px solid #ffffff !important;
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.6);
 }
 
-.compare-image-layer {
+/* Both images lock to 100cqw (full width of outer stage) so they overlay 1:1 */
+.compare-panel-2d .compare-image-layer,
+.compare-panel-3d .compare-image-layer {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 100cqw;
   height: 100%;
   object-fit: cover;
   pointer-events: none;
@@ -535,11 +541,12 @@
   width: 4px;
   background: #fff;
   cursor: ew-resize;
-  z-index: 25;
+  z-index: 30;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
 }
 
 .handle-circle-grip {
@@ -547,14 +554,20 @@
   height: 42px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-primary);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
   letter-spacing: -1px;
+  cursor: grab;
+  user-select: none;
+}
+
+.handle-circle-grip:active {
+  cursor: grabbing;
 }
 
 /* Difference-Map Peak Overlay Canvas */
@@ -572,6 +585,26 @@
 
 .difference-overlay-layer.visible {
   opacity: 0.65;
+}
+
+#compare-img-2d {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  pointer-events: none;
+}
+
+#compare-img-3d {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  /* Yeh image 50% box ke andar band nahi honi chahiye */
+  height: 100% !important;
+  object-fit: cover !important;
+  pointer-events: none;
 }
 
 /* =========================================================

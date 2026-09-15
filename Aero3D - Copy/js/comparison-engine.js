@@ -32,20 +32,63 @@ class ComparisonEngine {
     this.setupSliderDrag();
     this.setupPanAndZoom();
     this.generateDifferenceMap();
+
+    // Jab user Screen 4 par switch kare, tab dynamic width dobara measure karo
+    const syncOnVisible = () => {
+      if (this.syncWidth) this.syncWidth();
+    };
+
+    // Prototype screen buttons aur nav buttons par listener lagao
+    document.querySelectorAll('.screen-pill-btn, .nav-link, [data-target="screen-4"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTimeout(syncOnVisible, 60);
+      });
+    });
   }
 
   setupSliderDrag() {
     const handle = this.sliderHandle;
     const panel3D = this.panel3D;
     const container = this.container;
+    const img3D = document.getElementById('compare-img-3d');
+    const img2D = document.getElementById('compare-img-2d');
+
+    // Container ki current real width padh kar img3D par exact lock lagana
+    this.syncWidth = () => {
+      if (!container || !img3D) return;
+      const rect = container.getBoundingClientRect();
+      const currentWidth = rect.width;
+
+      // Agar screen visible hai aur width > 0 hai
+      if (currentWidth > 0) {
+        img3D.style.width = currentWidth + 'px';
+        img3D.style.minWidth = currentWidth + 'px';
+        img3D.style.maxWidth = currentWidth + 'px';
+
+        if (img2D) {
+          img2D.style.width = currentWidth + 'px';
+          img2D.style.minWidth = currentWidth + 'px';
+          img2D.style.maxWidth = currentWidth + 'px';
+        }
+      }
+    };
+
+    // Run immediately and on resize
+    this.syncWidth();
+    window.addEventListener('resize', this.syncWidth);
 
     const onMove = (clientX) => {
       const rect = container.getBoundingClientRect();
+      if (rect.width === 0) return;
+
       let percent = ((clientX - rect.left) / rect.width) * 100;
-      percent = Math.max(5, Math.min(95, percent));
+      percent = Math.max(1, Math.min(99, percent));
 
       panel3D.style.width = `${percent}%`;
       handle.style.left = `${percent}%`;
+
+      // Drag ke time image stretch nahi honi chahiye
+      this.syncWidth();
     };
 
     handle.addEventListener('mousedown', (e) => {
@@ -54,29 +97,19 @@ class ComparisonEngine {
     });
 
     window.addEventListener('mousemove', (e) => {
-      if (this.isDragging) {
-        onMove(e.clientX);
-      }
+      if (this.isDragging) onMove(e.clientX);
     });
 
     window.addEventListener('mouseup', () => {
       this.isDragging = false;
     });
 
-    // Touch support for tablets/mobile
-    handle.addEventListener('touchstart', (e) => {
-      this.isDragging = true;
-    });
-
+    // Touch Support
+    handle.addEventListener('touchstart', () => { this.isDragging = true; }, { passive: true });
     window.addEventListener('touchmove', (e) => {
-      if (this.isDragging && e.touches.length > 0) {
-        onMove(e.touches[0].clientX);
-      }
+      if (this.isDragging && e.touches.length > 0) onMove(e.touches[0].clientX);
     });
-
-    window.addEventListener('touchend', () => {
-      this.isDragging = false;
-    });
+    window.addEventListener('touchend', () => { this.isDragging = false; });
   }
 
   setupPanAndZoom() {

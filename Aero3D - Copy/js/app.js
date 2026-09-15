@@ -76,6 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!compareEngine) {
           compareEngine = new ComparisonEngine('compare-slider-wrapper');
         }
+        // ADD THIS: Screen 4 aate hi width calibrate ho jaye
+        if (compareEngine && compareEngine.syncWidth) {
+          compareEngine.syncWidth();
+        }
       } else if (screenId === 'screen-5') {
         if (!altitudeEngine) {
           altitudeEngine = new AltitudeAnalyticsEngine();
