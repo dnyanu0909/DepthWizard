@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let studioTerrain = null;
   let droneSim = null;
   let compareEngine = null;
+  let compareTerrain = null; // Screen 4 3D viewer
   let altitudeEngine = null;
 
   // Track active screen
@@ -73,12 +74,22 @@ document.addEventListener('DOMContentLoaded', () => {
           droneSim.onResize();
         }
       } else if (screenId === 'screen-4') {
-        if (!compareEngine) {
-          compareEngine = new ComparisonEngine('compare-slider-wrapper');
+        if (!compareTerrain) {
+          compareTerrain = new TerrainEngine('compare-webgl-container', {
+            elevationScale: 1.2,
+            colormap: 'terrain',
+            preset: 'mountain'
+          });
+        } else {
+          compareTerrain.onResize();
         }
-        // ADD THIS: Screen 4 aate hi width calibrate ho jaye
-        if (compareEngine && compareEngine.syncWidth) {
-          compareEngine.syncWidth();
+
+        // Agar user pehle image upload kar chuka hai, toh 3D model yahan bhi update ho jaye
+        if (selectedFile && compareTerrain) {
+          const localUrl = URL.createObjectURL(selectedFile);
+          const img2D = document.getElementById('compare-img-2d');
+          if (img2D) img2D.src = localUrl;
+          compareTerrain.loadHeightmapFromImage(localUrl, localUrl);
         }
       } else if (screenId === 'screen-5') {
         if (!altitudeEngine) {
@@ -126,20 +137,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Preset photo datasets for Screen 1 Landing Stage
+  const LANDING_PRESETS = {
+    mountain: {
+      time: '384 ms',
+      vertices: '1.44M Vertices',
+      img2d: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80', // High-contrast Alpine Peak
+      img3d: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80'  // Or high-pass / DEM texture
+    },
+    urban: {
+      time: '412 ms',
+      vertices: '2.10M Vertices',
+      img2d: 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=1400&q=80', // Dubai / Coastal Grid
+      img3d: 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=1400&q=80'
+    },
+    river: {
+      time: '350 ms',
+      vertices: '1.18M Vertices',
+      img2d: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80', // River Canyon
+      img3d: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80'
+    }
+  };
+
   const updateLandingDemoPreset = (preset) => {
     const statsTime = document.getElementById('stat-render-time');
     const statsPoints = document.getElementById('stat-elevation-points');
-    
-    if (preset === 'mountain') {
-      if (statsTime) statsTime.textContent = '384 ms';
-      if (statsPoints) statsPoints.textContent = '1.44M Vertices';
-    } else if (preset === 'urban') {
-      if (statsTime) statsTime.textContent = '412 ms';
-      if (statsPoints) statsPoints.textContent = '2.10M Vertices';
-    } else if (preset === 'river') {
-      if (statsTime) statsTime.textContent = '350 ms';
-      if (statsPoints) statsPoints.textContent = '1.18M Vertices';
-    }
+    const landingImg2D = document.getElementById('landing-img-2d');
+    const landingImg3D = document.getElementById('landing-img-3d');
+
+    const config = LANDING_PRESETS[preset] || LANDING_PRESETS.mountain;
+
+    if (statsTime) statsTime.textContent = config.time;
+    if (statsPoints) statsPoints.textContent = config.vertices;
+    if (landingImg2D) landingImg2D.src = config.img2d;
+    if (landingImg3D) landingImg3D.src = config.img3d;
   };
 
   if (demoPreviewBtn) {
@@ -224,10 +255,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const fileInput = document.getElementById('studio-file-input');
   const processBtn = document.getElementById('btn-process-image') || document.querySelector('.sidebar-card .btn-primary');
   let selectedFile = null;
+  let isProcessing = false;
 
   async function handleFileProcess(file) {
-    if (!file) return;
+    if (!file || isProcessing) return;
     selectedFile = file;
+    isProcessing = true;
+
+    if (processBtn) {
+      processBtn.disabled = true;
+      processBtn.style.opacity = '0.6';
+      processBtn.innerHTML = `<span>⏳</span> Analyzing Contours...`;
+    }
 
     // 1. Immediately update upload box UI to show preview badge
     if (dropArea) {
@@ -267,11 +306,13 @@ document.addEventListener('DOMContentLoaded', () => {
         droneSim.loadHeightmapFromImage(result.heightmap_url, result.original_url);
       }
 
-      // 4. Update Screen 4 comparison images
+      // 4. Update Screen 4 2D Image & 3D Model
       const img2D = document.getElementById('compare-img-2d');
-      const img3D = document.getElementById('compare-img-3d');
       if (img2D) img2D.src = result.original_url;
-      if (img3D) img3D.src = result.heightmap_url;
+
+      if (compareTerrain) {
+        compareTerrain.loadHeightmapFromImage(result.heightmap_url, result.original_url);
+      }
 
       // 5. Update Screen 5 Telemetry cards
       const peakVal = document.querySelector('.metric-primary-val');
@@ -282,6 +323,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error("[Aero3D Upload Error]", err);
       showToast("Upload failed. Check console for details.");
+    } finally {
+      isProcessing = false;
+      if (processBtn) {
+        processBtn.disabled = false;
+        processBtn.style.opacity = '1';
+        processBtn.innerHTML = `Process Image`;
+      }
     }
   }
 
@@ -329,9 +377,44 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.btn-export').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const format = e.currentTarget.dataset.format || 'Mesh';
+      if (format === 'OBJ') return;
       showToast(`Exporting ${format} terrain package... File generated.`);
     });
   });
+
+  const btnExportOBJ = document.querySelector('[data-format="OBJ"]') || document.getElementById('btn-export-obj');
+  if (btnExportOBJ) {
+    btnExportOBJ.addEventListener('click', () => {
+      if (!studioTerrain || !studioTerrain.mesh) {
+        showToast("No active terrain to export!");
+        return;
+      }
+
+      showToast("Packaging Wavefront 3D OBJ file...");
+
+      const geom = studioTerrain.mesh.geometry;
+      const pos = geom.attributes.position;
+      let objContent = "# Aero3D Extruded Digital Elevation Model\n";
+
+      for (let i = 0; i < pos.count; i++) {
+        objContent += `v ${pos.getX(i).toFixed(3)} ${pos.getY(i).toFixed(3)} ${pos.getZ(i).toFixed(3)}\n`;
+      }
+
+      if (geom.index) {
+        const idx = geom.index;
+        for (let i = 0; i < idx.count; i += 3) {
+          objContent += `f ${idx.getX(i) + 1} ${idx.getX(i + 1) + 1} ${idx.getX(i + 2) + 1}\n`;
+        }
+      }
+
+      const blob = new Blob([objContent], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Aero3D_Terrain_Mesh_${Date.now()}.obj`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+  }
 
   // --- ZOOM & CAMERA CONTROLS ---
   const btnZoomIn = document.getElementById('stage-zoom-in');
@@ -491,4 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial screen setup
   switchScreen('screen-1');
+
+  // Screen 1 initialization
+  updateLandingDemoPreset('mountain');
 });

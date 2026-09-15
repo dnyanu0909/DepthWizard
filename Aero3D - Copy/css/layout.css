@@ -449,6 +449,7 @@
   border-radius: var(--radius-xl);
   min-height: 480px;
   background: #000;
+  container-type: inline-size;
 }
 
 .sandbox-top-controls {

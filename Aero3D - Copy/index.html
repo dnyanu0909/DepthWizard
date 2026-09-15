@@ -174,60 +174,51 @@
               </div>
             </div>
 
-            <!-- Center/Right Split Demo Stage -->
-            <div id="landing-showcase-stage" class="showcase-stage-card glass-panel">
-              <!-- Top Demo Controls -->
-              <div class="sandbox-top-controls">
-                <!-- Presets -->
-                <div class="tile-preset-selector">
-                  <button class="preset-chip active" data-preset="mountain">Mountain Ridges</button>
-                  <button class="preset-chip" data-preset="urban">Urban Grid</button>
-                  <button class="preset-chip" data-preset="river">River Basins</button>
-                </div>
-
-                <!-- Live Render Stats & Button -->
-                <div style="display: flex; gap: 10px; align-items: center;">
-                  <div class="render-stats-pill">
-                    <span>⚡ <strong id="stat-render-time" class="stat-highlight">384 ms</strong></span>
-                    <span>•</span>
-                    <span id="stat-elevation-points" class="stat-highlight">1.44M Vertices</span>
-                    <span>•</span>
-                    <span>60 FPS WebGL</span>
-                  </div>
-                  <button id="btn-generate-demo" class="btn-primary" style="padding: 7px 16px; font-size: 13px;">
-                    Generate 3D Preview
-                  </button>
-                </div>
-              </div>
-
-              <!-- Interactive Split-Slider Viewer -->
-              <div class="compare-slider-wrapper" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-                <!-- 2D Layer (Right Base) -->
-                <div class="compare-panel-2d">
-                  <img src="assets/media_1789412458760.jpg" alt="2D Satellite Aerial" class="compare-image-layer" style="object-position: 42% 52%; filter: contrast(1.08);">
-                  <span class="panel-badge badge-2d">2D Satellite Image</span>
-                </div>
-
-                <!-- 3D Layer (Left Split) -->
-                <div id="landing-3d-panel" class="compare-panel-3d" style="width: 50%;">
-                  <img src="assets/media_1789412458750.jpg" alt="3D Rendered Mesh" class="compare-image-layer" style="object-position: 70% 48%; filter: saturate(1.15);">
-                  <span class="panel-badge badge-3d">3D Terrain Model</span>
-                </div>
-
-                <!-- Split Handle -->
-                <div id="landing-split-handle" class="compare-slider-handle" style="left: 50%;">
-                  <div class="handle-circle-grip">&lang; &rang;</div>
-                </div>
-
-                <!-- Floating Canvas Navigation Controls -->
-                <div class="stage-zoom-controls" style="bottom: 24px; right: 20px;">
-                  <button class="zoom-btn" title="Zoom In">+</button>
-                  <button class="zoom-btn" title="Home View">⌂</button>
-                  <button class="zoom-btn" title="Reset Orbit">⟲</button>
-                  <button class="zoom-btn" title="Zoom Out">-</button>
-                </div>
-              </div>
+        <!-- Screen 1: Interactive Showcase Stage -->
+        <div class="showcase-stage-card" id="landing-showcase-stage">
+          <!-- Top Floating Stats & Presets -->
+          <div class="sandbox-top-controls">
+            <div class="tile-preset-selector">
+              <button class="preset-chip active" data-preset="mountain">Mountain Ridges</button>
+              <button class="preset-chip" data-preset="urban">Urban Grid</button>
+              <button class="preset-chip" data-preset="river">River Basins</button>
             </div>
+
+            <div class="render-stats-pill">
+              <span>⚡ <strong id="stat-render-time">384 ms</strong></span>
+              <span>•</span>
+              <span class="stat-highlight" id="stat-elevation-points">1.44M Vertices</span>
+              <span>•</span>
+              <span>60 FPS WebGL</span>
+            </div>
+
+            <button class="btn-primary" id="btn-generate-demo" style="padding: 6px 16px; font-size: 13px;">
+              Generate 3D Preview
+            </button>
+          </div>
+
+          <!-- 2D Satellite Background Layer -->
+          <div class="landing-layer-2d" style="position: absolute; inset: 0; overflow: hidden;">
+            <img id="landing-img-2d" 
+                 src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80" 
+                 alt="2D Satellite" 
+                 style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+          </div>
+
+          <!-- 3D Neural Extrusion Overlay (Wipe Panel) -->
+          <div class="landing-layer-3d" id="landing-3d-panel" 
+               style="position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; border-right: 2px solid #fff; box-shadow: 4px 0 16px rgba(0,0,0,0.5); z-index: 10;">
+            <img id="landing-img-3d" 
+                 src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80" 
+                 alt="3D Extrusion DEM" 
+                 style="width: 100cqw; min-width: 800px; height: 100%; object-fit: cover; filter: contrast(140%) brightness(90%) hue-rotate(190deg);" />
+          </div>
+
+          <!-- Draggable Split Handle -->
+          <div class="compare-slider-handle" id="landing-split-handle" style="left: 50%; z-index: 25;">
+            <div class="handle-circle-grip">⬌</div>
+          </div>
+        </div>
 
           </div>
 
@@ -679,42 +670,20 @@
             </div>
           </div>
 
-          <!-- Comparison Viewport Stage (Side-by-Side Split Slider) -->
-          <div class="compare-stage-card">
-            <div id="compare-slider-wrapper" class="compare-slider-wrapper">
-              
-              <!-- Left Panel: 2D Satellite Image -->
-              <div class="compare-panel-2d">
-                <img id="compare-img-2d" src="assets/media_1789412458760.jpg" alt="Source 2D Satellite" class="compare-image-layer" style="object-position: 42% 52%;">
-                <span class="panel-badge badge-2d">Source Satellite 2D (Sentinel-2 High-Res &bull; 0.5m GSD)</span>
-                
-                <!-- Coordinate Grid Lines -->
-                <div class="coord-grid-overlay">
-                  <span class="coord-grid-ticks">35&deg; 50' N / 120&deg; 16' E &bull; Grid 500m</span>
-                </div>
-              </div>
-
-              <!-- Right Panel: Synchronized 3D Textured Relief Mesh -->
-              <div id="compare-panel-3d" class="compare-panel-3d">
-                <img id="compare-img-3d" src="assets/media_1789412458750.jpg" alt="Extruded 3D Relief Mesh" class="compare-image-layer" style="object-position: 70% 48%;">
-                <span class="panel-badge badge-3d">Aero3D Neural DEM (Extruded Surface Relief)</span>
-                
-                <!-- Coordinate Grid Lines for 3D -->
-                <div class="coord-grid-overlay"></div>
-              </div>
-
-              <!-- Peak Elevation Difference Map Overlay Layer -->
-              <div id="difference-overlay-layer" class="difference-overlay-layer">
-                <canvas id="difference-canvas"></canvas>
-              </div>
-
-              <!-- Central Draggable Split Slider Handle -->
-              <div id="compare-slider-handle" class="compare-slider-handle">
-                <div class="handle-circle-grip">&lang; &rang;</div>
-              </div>
-
-            </div>
+        <!-- Screen 4 Main Stage: 50% 3D + 50% 2D -->
+        <div class="compare-stage-card">
+          <!-- Left: Real Interactive 3D Canvas -->
+          <div class="compare-split-half compare-3d-box">
+            <span class="panel-badge badge-3d">Aero3D Interactive DEM (WebGL)</span>
+            <div id="compare-webgl-container" style="width: 100%; height: 100%;"></div>
           </div>
+
+          <!-- Right: Flat Source Satellite 2D Image -->
+          <div class="compare-split-half compare-2d-box">
+            <span class="panel-badge badge-2d">Source Satellite 2D (Original)</span>
+            <img id="compare-img-2d" src="assets/media_1789412458760.jpg" alt="Satellite 2D" />
+          </div>
+        </div>
 
         </div>
       </section>
