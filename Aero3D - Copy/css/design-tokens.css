@@ -1,0 +1,94 @@
+/* Aero3D Design Tokens & Core Theme
+   Grounded Earth Tones & Atmospheric Twilight Theme
+   Strictly Times New Roman Typography */
+
+:root {
+  /* Typography */
+  --font-serif: "Times New Roman", Times, Baskerville, "Playfair Display", Georgia, serif;
+  --font-display: "Times New Roman", Times, Georgia, serif;
+  --font-mono: "Times New Roman", Times, "Courier New", monospace;
+
+  /* Atmospheric Sky & Terrain Background */
+  --bg-gradient: linear-gradient(135deg, #a4b7e8 0%, #c4b5e7 25%, #e5b0cb 50%, #c8b7e8 75%, #a6b9e8 100%);
+  --bg-radial: radial-gradient(circle at 50% 25%, rgba(245, 185, 210, 0.45) 0%, rgba(195, 185, 232, 0.25) 50%, transparent 80%);
+  --bg-dark-hud: rgba(18, 24, 48, 0.82);
+
+  /* Frosted Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.42);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.78);
+  --glass-bg-input: rgba(255, 255, 255, 0.55);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.78);
+  --glass-border-subtle: 1px solid rgba(255, 255, 255, 0.45);
+  --glass-border-focus: 1px solid rgba(92, 65, 199, 0.55);
+  --glass-shadow: 0 14px 34px rgba(45, 38, 90, 0.08), 0 2px 4px rgba(255, 255, 255, 0.65) inset;
+  --glass-shadow-lg: 0 22px 50px rgba(45, 38, 90, 0.13), 0 3px 6px rgba(255, 255, 255, 0.8) inset;
+  --glass-shadow-dock: 0 18px 45px rgba(35, 30, 80, 0.16), 0 2px 6px rgba(255, 255, 255, 0.85) inset;
+  --backdrop-blur: blur(20px);
+  --backdrop-blur-sm: blur(12px);
+
+  /* Color Palette */
+  --text-primary: #18204c;
+  --text-secondary: #4b5277;
+  --text-muted: #6f769b;
+  --text-on-dark: #f2f4ff;
+
+  --accent-purple: #5c41c7;
+  --accent-purple-light: #7b62db;
+  --accent-purple-glow: rgba(92, 65, 199, 0.25);
+  --accent-gradient-btn: linear-gradient(135deg, #c79feb 0%, #f4a6bf 100%);
+  --accent-gradient-btn-hover: linear-gradient(135deg, #bd8ee7 0%, #f095b2 100%);
+  --accent-pill-border: rgba(186, 142, 222, 0.6);
+
+  /* Earth & Satellite Tones */
+  --color-slate-grey: #636b7b;
+  --color-muted-charcoal: #303746;
+  --color-topographic-green: #3b6b55;
+  --color-topographic-green-light: #528c70;
+  --color-earth-brown: #7b5b3e;
+  --color-deep-blue: #1e356e;
+  --color-atmospheric-blue: #2c4485;
+  --color-cyan-glow: #38e1d5;
+  --color-flight-path: #6a48d7;
+
+  /* UI Metrics & Radii */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-pill: 9999px;
+
+  /* Transitions */
+  --transition-smooth: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.16s ease-out;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-serif);
+  color: var(--text-primary);
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-radial);
+  pointer-events: none;
+  z-index: 0;
+}

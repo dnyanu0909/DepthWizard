@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aero3D — Satellite & Aerial Imagery to Interactive 3D Terrain</title>
+  
+  <!-- Core Design Tokens & Component Styles -->
+  <link rel="stylesheet" href="css/design-tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- Three.js for Real-Time 3D WebGL Terrain Extrusion & Drone Flight (Local & Offline-Ready) -->
+  <script src="js/three.min.js"></script>
+</head>
+<body>
+
+  <!-- App Wrapper -->
+  <div class="app-container">
+
+    <!-- =========================================================
+         TOP PROTOTYPE SWITCHER (Instant Testing & QA for All 5 Screens)
+         ========================================================= -->
+    <header class="prototype-switcher-bar">
+      <div class="prototype-title">
+        <span>Aero3D Design System Suite</span>
+        <span class="prototype-badge">5 Screens High-Fidelity</span>
+      </div>
+      <div class="screen-pills">
+        <button class="screen-pill-btn active" data-target="screen-1">1. Landing Showcase</button>
+        <button class="screen-pill-btn" data-target="screen-2">2. Core Workspace</button>
+        <button class="screen-pill-btn" data-target="screen-3">3. Drone Flight (100%)</button>
+        <button class="screen-pill-btn" data-target="screen-4">4. 2D vs 3D Compare</button>
+        <button class="screen-pill-btn" data-target="screen-5">5. Altitude & Location</button>
+      </div>
+    </header>
+
+    <!-- Master Viewport for Screens -->
+    <main class="screens-viewport">
+
+      <!-- =========================================================
+           SCREEN 1: LANDING / DEMO SHOWCASE PAGE
+           ========================================================= -->
+      <section id="screen-1" class="screen-view active">
+        <!-- Screen 1 Header -->
+        <header class="app-header">
+          <div class="brand-wrapper" data-nav-target="screen-1">
+            <div class="brand-icon">
+              <!-- Geometric Layers Satellite Icon -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            <div class="brand-text-group">
+              <span class="brand-title">Aero3D</span>
+              <span class="brand-subtitle">Satellite to 3D</span>
+            </div>
+          </div>
+
+          <nav>
+            <ul class="nav-menu">
+              <li><a class="nav-link active" data-nav-target="screen-1">Demo</a></li>
+              <li><a class="nav-link" href="#features">Features</a></li>
+              <li><a class="nav-link" href="#how-it-works">How It Works</a></li>
+              <li><a class="nav-link" href="#use-cases">Use Cases</a></li>
+              <li><a class="nav-link" href="#pricing">Pricing</a></li>
+              <li><a class="nav-link" href="#docs">Docs</a></li>
+              <li><a class="nav-link" href="#api">API</a></li>
+              <li><a class="nav-link" href="#about">About</a></li>
+            </ul>
+          </nav>
+
+          <div class="header-actions">
+            <button class="btn-primary" data-nav-target="screen-2">
+              Launch Studio &rarr;
+            </button>
+          </div>
+        </header>
+
+        <!-- Landing Hero Section -->
+        <div class="landing-hero-container">
+          <div class="landing-top-bar">
+            <div class="hero-title-group">
+              <h1 class="hero-title">Aerial Photo<br>to 3D View</h1>
+              <p class="hero-subtitle">Transform satellite imagery into an interactive terrain model with sub-meter elevation reconstruction and cinematic flythroughs.</p>
+              <button class="btn-primary" data-nav-target="screen-2" style="font-size: 16px; padding: 12px 28px;">
+                Start Demo &rarr;
+              </button>
+            </div>
+
+            <!-- Top-Right Feature Stat Tags -->
+            <div class="hero-tag-pills">
+              <div class="stat-tag-card">
+                <div class="stat-tag-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="22" y1="12" x2="18" y2="12"></line>
+                    <line x1="6" y1="12" x2="2" y2="12"></line>
+                    <line x1="12" y1="6" x2="12" y2="2"></line>
+                    <line x1="12" y1="22" x2="12" y2="18"></line>
+                  </svg>
+                </div>
+                <div class="stat-tag-text">
+                  <h4>High Accuracy</h4>
+                  <p>Sub-meter precision</p>
+                </div>
+              </div>
+
+              <div class="stat-tag-card">
+                <div class="stat-tag-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                </div>
+                <div class="stat-tag-text">
+                  <h4>3D Interactive</h4>
+                  <p>Explore every angle</p>
+                </div>
+              </div>
+
+              <div class="stat-tag-card">
+                <div class="stat-tag-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                  </svg>
+                </div>
+                <div class="stat-tag-text">
+                  <h4>Web Based</h4>
+                  <p>No installation</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Demo Sandbox Showcase -->
+          <div class="landing-showcase-grid">
+            
+            <!-- Left Workflow Steps Card -->
+            <div class="workflow-steps-card glass-panel">
+              <div class="workflow-step">
+                <div class="step-number-bubble">1</div>
+                <div class="step-content">
+                  <h4>Upload Image</h4>
+                  <div class="mini-upload-box" data-nav-target="screen-2">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5c41c7" stroke-width="1.8">
+                      <path d="M16 16l-4-4-4 4"></path>
+                      <path d="M12 12v9"></path>
+                      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+                    </svg>
+                    <p>Drag & drop image here<br>or click to browse</p>
+                  </div>
+                  <p style="margin-top: 6px; font-size: 11px; color: var(--text-muted);">JPEG, PNG, GeoTIFF up to 100MB</p>
+                </div>
+              </div>
+
+              <div class="workflow-step">
+                <div class="step-number-bubble">2</div>
+                <div class="step-content">
+                  <h4>Processing</h4>
+                  <p>Our AI neural photogrammetry model analyzes multi-frequency terrain relief and depth gradients.</p>
+                </div>
+              </div>
+
+              <div class="workflow-step">
+                <div class="step-number-bubble">3</div>
+                <div class="step-content">
+                  <h4>3D Model Ready</h4>
+                  <p>Explore, measure elevations, and fly over reconstructed mesh in real-time 60 FPS WebGL.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Center/Right Split Demo Stage -->
+            <div id="landing-showcase-stage" class="showcase-stage-card glass-panel">
+              <!-- Top Demo Controls -->
+              <div class="sandbox-top-controls">
+                <!-- Presets -->
+                <div class="tile-preset-selector">
+                  <button class="preset-chip active" data-preset="mountain">Mountain Ridges</button>
+                  <button class="preset-chip" data-preset="urban">Urban Grid</button>
+                  <button class="preset-chip" data-preset="river">River Basins</button>
+                </div>
+
+                <!-- Live Render Stats & Button -->
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <div class="render-stats-pill">
+                    <span>⚡ <strong id="stat-render-time" class="stat-highlight">384 ms</strong></span>
+                    <span>•</span>
+                    <span id="stat-elevation-points" class="stat-highlight">1.44M Vertices</span>
+                    <span>•</span>
+                    <span>60 FPS WebGL</span>
+                  </div>
+                  <button id="btn-generate-demo" class="btn-primary" style="padding: 7px 16px; font-size: 13px;">
+                    Generate 3D Preview
+                  </button>
+                </div>
+              </div>
+
+              <!-- Interactive Split-Slider Viewer -->
+              <div class="compare-slider-wrapper" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                <!-- 2D Layer (Right Base) -->
+                <div class="compare-panel-2d">
+                  <img src="assets/media_1789412458760.jpg" alt="2D Satellite Aerial" class="compare-image-layer" style="object-position: 42% 52%; filter: contrast(1.08);">
+                  <span class="panel-badge badge-2d">2D Satellite Image</span>
+                </div>
+
+                <!-- 3D Layer (Left Split) -->
+                <div id="landing-3d-panel" class="compare-panel-3d" style="width: 50%;">
+                  <img src="assets/media_1789412458750.jpg" alt="3D Rendered Mesh" class="compare-image-layer" style="object-position: 70% 48%; filter: saturate(1.15);">
+                  <span class="panel-badge badge-3d">3D Terrain Model</span>
+                </div>
+
+                <!-- Split Handle -->
+                <div id="landing-split-handle" class="compare-slider-handle" style="left: 50%;">
+                  <div class="handle-circle-grip">&lang; &rang;</div>
+                </div>
+
+                <!-- Floating Canvas Navigation Controls -->
+                <div class="stage-zoom-controls" style="bottom: 24px; right: 20px;">
+                  <button class="zoom-btn" title="Zoom In">+</button>
+                  <button class="zoom-btn" title="Home View">⌂</button>
+                  <button class="zoom-btn" title="Reset Orbit">⟲</button>
+                  <button class="zoom-btn" title="Zoom Out">-</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Feature Highlights Cards Row -->
+          <div class="features-grid">
+            <div class="feature-card glass-panel">
+              <div class="feature-icon-wrapper">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </div>
+              <h3>Single-Photo Input</h3>
+              <p>Reconstruct volumetric height-maps from any standard aerial drone orthophoto or satellite snapshot without multi-angle telemetry.</p>
+            </div>
+
+            <div class="feature-card glass-panel">
+              <div class="feature-icon-wrapper">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+              </div>
+              <h3>AI Depth Reconstruction</h3>
+              <p>Multi-frequency neural networks extract fine fissures, ridgelines, and bathymetric water features with sub-meter vertical resolution.</p>
+            </div>
+
+            <div class="feature-card glass-panel">
+              <div class="feature-icon-wrapper">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+              </div>
+              <h3>Interactive Flythrough Engine</h3>
+              <p>Experience real-time first-person drone flight with calibrated artificial horizon HUD, custom waypoint paths, and altitude telemetry.</p>
+            </div>
+
+            <div class="feature-card glass-panel">
+              <div class="feature-icon-wrapper">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              </div>
+              <h3>Export & Share</h3>
+              <p>Export production-ready 3D assets in standard OBJ, GLTF, and 16-bit GeoTIFF formats for GIS analysis or CAD software.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Landing Footer -->
+        <footer class="landing-footer">
+          <div>&copy; 2024 Aero3D Inc. All rights reserved.</div>
+          <div class="landing-footer-links">
+            <a href="#privacy">Privacy Policy</a>
+            <a href="#terms">Terms of Use</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </footer>
+      </section>
+
+      <!-- =========================================================
+           SCREEN 2: CORE WORKSPACE / STUDIO VIEW
+           ========================================================= -->
+      <section id="screen-2" class="screen-view">
+        <div class="studio-layout">
+          <!-- Top Slim Header -->
+          <header class="studio-header">
+            <div class="brand-wrapper" data-nav-target="screen-1">
+              <div class="brand-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+              </div>
+              <div class="brand-text-group">
+                <span class="brand-title" style="font-size: 20px;">Terrain Studio</span>
+                <span class="brand-subtitle">Aero3D v2.4</span>
+              </div>
+            </div>
+
+            <!-- File Status Readout -->
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary);">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #28a745; display: inline-block;"></span>
+              <span>Alpine_Ridge_DEM_v2.tif &bull; 16-bit GeoTIFF (Processed &bull; Ready)</span>
+            </div>
+
+            <!-- Export Actions & Links -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button class="btn-secondary btn-export" data-format="OBJ">
+                <span>OBJ</span>
+              </button>
+              <button class="btn-secondary btn-export" data-format="GLTF">
+                <span>GLTF</span>
+              </button>
+              <button class="btn-secondary btn-export" data-format="GeoTIFF">
+                <span>GeoTIFF</span>
+              </button>
+              <span style="width: 1px; height: 22px; background: rgba(0,0,0,0.15); margin: 0 4px;"></span>
+              <button class="btn-secondary" style="padding: 7px 12px; font-size: 12.5px;">Help</button>
+              <button class="btn-secondary" style="padding: 7px 12px; font-size: 12.5px;">Settings</button>
+              <button class="btn-secondary" style="padding: 7px 12px; font-size: 12.5px;">Account</button>
+            </div>
+          </header>
+
+          <!-- Studio Main Body (30% Left Sidebar / 70% 3D Stage) -->
+          <div class="studio-main-body">
+            
+            <!-- Left Sidebar (30% Width) -->
+            <aside class="studio-sidebar">
+              
+              <!-- Upload Photo Card -->
+              <div class="sidebar-card glass-panel">
+                <div class="card-heading-row">
+                  <h3 class="card-title">Upload Photo</h3>
+                  <span style="font-size: 12px; color: var(--text-muted);">Source 2D</span>
+                </div>
+
+                <div id="studio-drop-area" class="drag-drop-area">
+                  <div class="upload-icon-circle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M16 16l-4-4-4 4"></path>
+                      <path d="M12 12v9"></path>
+                      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+                    </svg>
+                  </div>
+                  <p class="drag-drop-prompt">Drag & drop an image here or <span>click to browse</span></p>
+                  <p class="format-tags">Supported formats: .jpg, .png, .tif (up to 100MB)</p>
+                  <input type="file" id="studio-file-input" style="display: none;" accept=".jpg,.png,.tif,.jpeg">
+                </div>
+
+                <button class="btn-primary" style="width: 100%; justify-content: center; padding: 10px;">
+                  Process Image
+                </button>
+              </div>
+
+              <!-- Processing Controls Card -->
+              <div class="sidebar-card glass-panel">
+                <div class="card-heading-row">
+                  <h3 class="card-title">Elevation & Depth Maps</h3>
+                  <span style="font-size: 12px; color: var(--text-muted);">Inference</span>
+                </div>
+
+                <!-- Grayscale vs Depth Map Previews -->
+                <div class="map-preview-grid">
+                  <div class="map-option-card active" data-type="grayscale">
+                    <div class="map-option-header">
+                      <input type="radio" name="map-view" checked id="opt-grayscale">
+                      <label for="opt-grayscale">Grayscale</label>
+                    </div>
+                    <canvas id="thumb-grayscale" width="120" height="64" style="background: linear-gradient(135deg, #111, #888, #fff); border-radius: 4px;"></canvas>
+                  </div>
+
+                  <div class="map-option-card" data-type="depth">
+                    <div class="map-option-header">
+                      <input type="radio" name="map-view" id="opt-depth">
+                      <label for="opt-depth">Depth Map</label>
+                    </div>
+                    <canvas id="thumb-depth" width="120" height="64" style="background: radial-gradient(circle at 60% 40%, #fff, #666, #000); border-radius: 4px;"></canvas>
+                  </div>
+                </div>
+
+                <!-- Colormap Selectors -->
+                <div class="slider-group">
+                  <div class="slider-label-row">
+                    <span>Colormap Preset</span>
+                  </div>
+                  <div class="colormap-pills">
+                    <button class="colormap-pill-btn" data-colormap="grayscale">Grayscale</button>
+                    <button class="colormap-pill-btn" data-colormap="turbo">Turbo</button>
+                    <button class="colormap-pill-btn active" data-colormap="terrain">Terrain</button>
+                  </div>
+                </div>
+
+                <!-- Elevation Scale Slider -->
+                <div class="slider-group">
+                  <div class="slider-label-row">
+                    <span>Elevation Extrusion</span>
+                    <span id="elevation-val-badge" class="slider-val-badge">1.2x</span>
+                  </div>
+                  <input type="range" id="studio-elevation-slider" min="0.1" max="3.0" step="0.1" value="1.2">
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                    <span>Flat (0.1x)</span>
+                    <span>Nominal (1.0x)</span>
+                    <span>Exaggerated (3.0x)</span>
+                  </div>
+                </div>
+              </div>
+
+            </aside>
+
+            <!-- Main Workspace (70% Width) -->
+            <main class="studio-stage-wrapper glass-panel">
+              
+              <!-- 3D WebGL Viewport Container -->
+              <div id="studio-webgl-container" class="webgl-viewport-container">
+                <!-- North Arrow Indicator -->
+                <div class="stage-north-indicator">
+                  <span class="north-star">&#10022;</span>
+                  <span class="north-label">N</span>
+                </div>
+
+                <!-- Coordinates readout -->
+                <div class="stage-coords-badge">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5c41c7" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="22" y1="12" x2="18" y2="12"></line>
+                    <line x1="6" y1="12" x2="2" y2="12"></line>
+                    <line x1="12" y1="6" x2="12" y2="2"></line>
+                    <line x1="12" y1="22" x2="12" y2="18"></line>
+                  </svg>
+                  <span>37&deg; 46' 29" N &nbsp; 122&deg; 25' 09" W</span>
+                </div>
+
+                <!-- Floating Zoom Buttons -->
+                <div class="stage-zoom-controls">
+                  <button id="stage-zoom-in" class="zoom-btn" title="Zoom In">+</button>
+                  <button id="stage-reset-view" class="zoom-btn" title="Reset Orbit">↺</button>
+                  <button id="stage-zoom-out" class="zoom-btn" title="Zoom Out">-</button>
+                </div>
+              </div>
+
+              <!-- Bottom Floating Dock (3 Control Modules) -->
+              <nav class="studio-floating-dock">
+                
+                <!-- Module 1: Altitude / Location -->
+                <button class="dock-module-btn" data-nav-target="screen-5">
+                  <div class="dock-module-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M8 3l4 8 5-5 5 15H2L8 3z"></path>
+                      <circle cx="12" cy="7" r="2"></circle>
+                    </svg>
+                  </div>
+                  <span>Altitude / Location</span>
+                </button>
+
+                <div class="dock-divider"></div>
+
+                <!-- Module 2: 2D vs 3D Comparison -->
+                <button class="dock-module-btn" data-nav-target="screen-4">
+                  <div class="dock-module-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="12" y1="3" x2="12" y2="21"></line>
+                      <path d="M8 12l2 2 3-4"></path>
+                    </svg>
+                  </div>
+                  <span>2D / 3D Compare</span>
+                </button>
+
+                <div class="dock-divider"></div>
+
+                <!-- Module 3: Drone View -->
+                <button class="dock-module-btn" data-nav-target="screen-3">
+                  <div class="dock-module-icon">
+                    <!-- Quadcopter Drone Icon -->
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <line x1="12" y1="9" x2="12" y2="4"></line>
+                      <line x1="12" y1="15" x2="12" y2="20"></line>
+                      <line x1="9" y1="12" x2="4" y2="12"></line>
+                      <line x1="15" y1="12" x2="20" y2="12"></line>
+                      <circle cx="4" cy="4" r="2"></circle>
+                      <circle cx="20" cy="4" r="2"></circle>
+                      <circle cx="4" cy="20" r="2"></circle>
+                      <circle cx="20" cy="20" r="2"></circle>
+                    </svg>
+                  </div>
+                  <span>Drone View</span>
+                </button>
+
+              </nav>
+
+            </main>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SCREEN 3: FULLSCREEN DRONE FLIGHT VIEW (100% CANVAS)
+           ========================================================= -->
+      <section id="screen-3" class="screen-view">
+        <div class="drone-viewport-wrapper">
+          <!-- Edge-to-Edge WebGL Flight Canvas -->
+          <canvas id="drone-canvas"></canvas>
+
+          <!-- Minimalistic HUD Overlay -->
+          <div class="drone-hud-overlay">
+            
+            <!-- Top HUD Heading & Telemetry Bar -->
+            <div class="hud-top-bar">
+              <!-- Airspeed Readout -->
+              <div class="hud-telemetry-badge">
+                <span class="hud-metric-label">Airspeed</span>
+                <div>
+                  <span id="hud-airspeed-val" class="hud-metric-val">54</span>
+                  <span class="hud-metric-unit">km/h</span>
+                </div>
+              </div>
+
+              <!-- Center Compass Tape -->
+              <div class="compass-tape-container">
+                <span id="hud-compass-heading" class="compass-heading-text">042&deg; NE</span>
+                <div class="compass-tape-ticks">
+                  <span>030</span>
+                  <span>|</span>
+                  <span style="color: #fff; font-weight: bold;">042</span>
+                  <span>|</span>
+                  <span>060</span>
+                </div>
+              </div>
+
+              <!-- Altitude Counter -->
+              <div class="hud-telemetry-badge" style="align-items: flex-end;">
+                <span class="hud-metric-label">Altitude</span>
+                <div>
+                  <span id="hud-altitude-val" class="hud-metric-val">412 m</span>
+                  <span class="hud-metric-unit">AGL</span>
+                </div>
+                <span id="hud-msl-val" style="font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px;">2,134 m MSL</span>
+              </div>
+            </div>
+
+            <!-- Center Artificial Horizon Indicator SVG -->
+            <div class="hud-center-stage">
+              <svg class="artificial-horizon-svg" viewBox="0 0 320 320">
+                <!-- Pitch & Roll dynamic group -->
+                <g id="hud-horizon-pitch-group">
+                  <!-- Pitch ladder lines -->
+                  <line x1="120" y1="120" x2="200" y2="120" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"></line>
+                  <text x="210" y="124" fill="rgba(255,255,255,0.7)" font-size="10" font-family="Times New Roman">+10&deg;</text>
+                  
+                  <line x1="100" y1="160" x2="220" y2="160" stroke="#38e1d5" stroke-width="2"></line>
+                  <text x="230" y="164" fill="#38e1d5" font-size="11" font-family="Times New Roman">0&deg; HORIZON</text>
+
+                  <line x1="120" y1="200" x2="200" y2="200" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-dasharray="4,4"></line>
+                  <text x="210" y="204" fill="rgba(255,255,255,0.7)" font-size="10" font-family="Times New Roman">-10&deg;</text>
+                </g>
+
+                <!-- Static Aircraft Reticle in Center -->
+                <circle cx="160" cy="160" r="4" fill="#38e1d5"></circle>
+                <line x1="130" y1="160" x2="150" y2="160" stroke="#38e1d5" stroke-width="2.5"></line>
+                <line x1="170" y1="160" x2="190" y2="160" stroke="#38e1d5" stroke-width="2.5"></line>
+                <line x1="160" y1="150" x2="160" y2="140" stroke="#38e1d5" stroke-width="2.5"></line>
+              </svg>
+            </div>
+
+            <!-- Floating Flight Footer Bar -->
+            <footer class="drone-floating-footer">
+              
+              <!-- WASD / Arrow Control Map Indicator -->
+              <div class="wasd-control-map">
+                <div class="key-cluster">
+                  <div class="key-pill key-w">W</div>
+                  <div class="key-pill key-a">A</div>
+                  <div class="key-pill key-s">S</div>
+                  <div class="key-pill key-d">D</div>
+                </div>
+                <div class="key-cluster-desc">
+                  <strong>Flight Controls</strong><br>
+                  Pitch / Roll / Yaw
+                </div>
+              </div>
+
+              <!-- Speed Multiplier -->
+              <div class="flight-control-group">
+                <span class="control-group-title">Speed:</span>
+                <div class="speed-pills">
+                  <button class="speed-btn active" data-speed="1">1x</button>
+                  <button class="speed-btn" data-speed="2">2x</button>
+                  <button class="speed-btn" data-speed="5">5x</button>
+                </div>
+              </div>
+
+              <!-- Waypoint Path Recorder -->
+              <div class="waypoint-recorder-group">
+                <button id="record-flight-btn" class="record-btn">
+                  <span class="rec-dot">&bull;</span> Record Flight
+                </button>
+                <span id="rec-timer-badge" style="display: none; font-size: 11px; color: #c92a2a; font-weight: bold;">REC 00:00:00</span>
+                <div class="playback-controls">
+                  <button id="play-flight-btn" class="hud-btn-mini" title="Play Flight Path">&blacktriangleright;</button>
+                  <button id="pause-flight-btn" class="hud-btn-mini" title="Pause Flight Path">&#10074;&#10074;</button>
+                </div>
+              </div>
+
+              <!-- Camera Angle Presets -->
+              <div class="flight-control-group">
+                <span class="control-group-title">Angle:</span>
+                <div class="camera-preset-pills">
+                  <button class="camera-preset-btn" data-preset="nadir">Nadir 90&deg;</button>
+                  <button class="camera-preset-btn" data-preset="oblique">Oblique 45&deg;</button>
+                  <button class="camera-preset-btn active" data-preset="horizon">Horizon 0&deg;</button>
+                </div>
+              </div>
+
+              <!-- Exit to Studio Button -->
+              <button class="exit-studio-btn" data-nav-target="screen-2">
+                <span>&larr; Exit to Studio</span>
+              </button>
+
+            </footer>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SCREEN 4: 2D VS 3D COMPARISON WINDOW
+           ========================================================= -->
+      <section id="screen-4" class="screen-view">
+        <div class="compare-screen-container">
+          
+          <!-- Top Bar -->
+          <div class="compare-top-header">
+            <div class="compare-title-group">
+              <h2>2D vs 3D Comparison</h2>
+              <p>Synchronized dual-viewport inspection with coordinate grid alignment and elevation difference overlay.</p>
+            </div>
+
+            <button class="btn-secondary" data-nav-target="screen-2">
+              &larr; Back to Studio
+            </button>
+          </div>
+
+          <!-- Control Toolbar -->
+          <div class="compare-toolbar">
+            <div class="compare-tools-left">
+              <!-- Dual-View Lock / Unlock Toggle -->
+              <button id="btn-toggle-lock" class="compare-toggle-btn active">
+                <span class="icon">&#128274;</span> Synchronized View
+              </button>
+
+              <!-- Difference Map Peak Overlay Toggle -->
+              <button id="btn-toggle-diff" class="compare-toggle-btn">
+                <span class="icon">&#128506;</span> Peak Difference Overlay
+              </button>
+            </div>
+
+            <div class="compare-tools-right">
+              <!-- Opacity Cross-Fade Slider -->
+              <div class="compare-opacity-group">
+                <span>3D Relief Opacity:</span>
+                <input type="range" id="compare-opacity-slider" min="0" max="1" step="0.05" value="1" style="width: 140px;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Comparison Viewport Stage (Side-by-Side Split Slider) -->
+          <div class="compare-stage-card">
+            <div id="compare-slider-wrapper" class="compare-slider-wrapper">
+              
+              <!-- Left Panel: 2D Satellite Image -->
+              <div class="compare-panel-2d">
+                <img id="compare-img-2d" src="assets/media_1789412458760.jpg" alt="Source 2D Satellite" class="compare-image-layer" style="object-position: 42% 52%;">
+                <span class="panel-badge badge-2d">Source Satellite 2D (Sentinel-2 High-Res &bull; 0.5m GSD)</span>
+                
+                <!-- Coordinate Grid Lines -->
+                <div class="coord-grid-overlay">
+                  <span class="coord-grid-ticks">35&deg; 50' N / 120&deg; 16' E &bull; Grid 500m</span>
+                </div>
+              </div>
+
+              <!-- Right Panel: Synchronized 3D Textured Relief Mesh -->
+              <div id="compare-panel-3d" class="compare-panel-3d">
+                <img id="compare-img-3d" src="assets/media_1789412458750.jpg" alt="Extruded 3D Relief Mesh" class="compare-image-layer" style="object-position: 70% 48%;">
+                <span class="panel-badge badge-3d">Aero3D Neural DEM (Extruded Surface Relief)</span>
+                
+                <!-- Coordinate Grid Lines for 3D -->
+                <div class="coord-grid-overlay"></div>
+              </div>
+
+              <!-- Peak Elevation Difference Map Overlay Layer -->
+              <div id="difference-overlay-layer" class="difference-overlay-layer">
+                <canvas id="difference-canvas"></canvas>
+              </div>
+
+              <!-- Central Draggable Split Slider Handle -->
+              <div id="compare-slider-handle" class="compare-slider-handle">
+                <div class="handle-circle-grip">&lang; &rang;</div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SCREEN 5: ALTITUDE & LOCATION MAP-BASED INFO PAGE
+           ========================================================= -->
+      <section id="screen-5" class="screen-view">
+        <!-- Header -->
+        <header class="app-header">
+          <div class="brand-wrapper" data-nav-target="screen-1">
+            <div class="brand-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            <div class="brand-text-group">
+              <span class="brand-title">Aero3D</span>
+              <span class="brand-subtitle">Satellite to 3D</span>
+            </div>
+          </div>
+
+          <nav>
+            <ul class="nav-menu">
+              <li><a class="nav-link" data-nav-target="screen-2">Dashboard</a></li>
+              <li><a class="nav-link active" data-nav-target="screen-5">Map</a></li>
+              <li><a class="nav-link" href="#scenes">Scenes</a></li>
+              <li><a class="nav-link" href="#tools">Tools</a></li>
+              <li><a class="nav-link" href="#data">Data</a></li>
+              <li><a class="nav-link" href="#help">Help</a></li>
+            </ul>
+          </nav>
+
+          <div class="header-actions">
+            <button class="btn-icon" title="Account Profile">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Main Map Container -->
+        <div class="map-screen-container">
+          
+          <!-- Title Row with "Open in 3D" Button -->
+          <div class="map-screen-top-header">
+            <div class="map-title-group">
+              <h2>Altitude / Location</h2>
+              <p>Explore elevation and coordinates</p>
+            </div>
+
+            <button class="btn-secondary" data-nav-target="screen-2" style="padding: 10px 22px; font-size: 15px; font-weight: 600;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+              <span>Open in 3D</span>
+            </button>
+          </div>
+
+          <!-- Main Grid: 60% Map + 40% Analytical Side Panel -->
+          <div class="map-dashboard-grid">
+            
+            <!-- Interactive Topographic 2D Map (60%) -->
+            <div class="topographic-map-card">
+              <canvas id="topographic-map-canvas"></canvas>
+
+              <!-- Compass Rose -->
+              <div class="map-compass-rose">
+                <svg viewBox="0 0 100 100" width="50" height="50">
+                  <polygon points="50,10 56,44 50,40" fill="#5c41c7"></polygon>
+                  <polygon points="50,10 44,44 50,40" fill="#7b62db"></polygon>
+                  <polygon points="50,90 56,56 50,60" fill="#888"></polygon>
+                  <polygon points="50,90 44,56 50,60" fill="#aaa"></polygon>
+                  <polygon points="10,50 44,44 40,50" fill="#888"></polygon>
+                  <polygon points="10,50 44,56 40,50" fill="#aaa"></polygon>
+                  <polygon points="90,50 56,44 60,50" fill="#888"></polygon>
+                  <polygon points="90,50 56,56 60,50" fill="#aaa"></polygon>
+                  <circle cx="50" cy="50" r="4" fill="#fff" stroke="#5c41c7" stroke-width="1.5"></circle>
+                  <text x="46" y="8" font-size="11" font-weight="bold" fill="#18204c" font-family="Times New Roman">N</text>
+                  <text x="47" y="99" font-size="10" fill="#555" font-family="Times New Roman">S</text>
+                  <text x="92" y="54" font-size="10" fill="#555" font-family="Times New Roman">E</text>
+                  <text x="1" y="54" font-size="10" fill="#555" font-family="Times New Roman">W</text>
+                </svg>
+              </div>
+
+              <!-- Summit Marker Pin with Tooltip -->
+              <div class="map-summit-pin">
+                <div class="pin-icon-wrapper">&#128205;</div>
+                <div class="pin-bubble">2,134 m</div>
+              </div>
+
+              <!-- Map Scale Bar -->
+              <div class="map-scale-bar">
+                <span>0</span>
+                <div class="scale-tick-line"></div>
+                <span>500</span>
+                <span>1000 m</span>
+              </div>
+            </div>
+
+            <!-- Analytical Side Panel (40%) -->
+            <aside class="map-analytical-panel">
+              
+              <!-- Location Card -->
+              <div class="data-metric-card glass-panel">
+                <div class="metric-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </div>
+                <div class="metric-card-content">
+                  <div class="metric-header-title">Location</div>
+                  <div class="metric-primary-val" style="font-size: 20px;">Alpine Ridge</div>
+                  <div class="metric-sub-val">Rocky Mountains &bull; Colorado, USA</div>
+                </div>
+              </div>
+
+              <!-- Altitude Card -->
+              <div class="data-metric-card glass-panel">
+                <div class="metric-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3l4 8 5-5 5 15H2L8 3z"></path>
+                  </svg>
+                </div>
+                <div class="metric-card-content">
+                  <div class="metric-header-title">Altitude</div>
+                  <div class="metric-primary-val">2,134 m</div>
+                  <div class="metric-sub-val">7,001 ft ASL</div>
+                </div>
+              </div>
+
+              <!-- Coordinates Card -->
+              <div class="data-metric-card glass-panel">
+                <div class="metric-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="22" y1="12" x2="18" y2="12"></line>
+                    <line x1="6" y1="12" x2="2" y2="12"></line>
+                    <line x1="12" y1="6" x2="12" y2="2"></line>
+                    <line x1="12" y1="22" x2="12" y2="18"></line>
+                  </svg>
+                </div>
+                <div class="metric-card-content">
+                  <div class="metric-header-title">Coordinates</div>
+                  <div style="font-size: 15px; font-weight: 700; color: var(--text-primary);">
+                    35&deg; 50' 35.12" N &nbsp; 120&deg; 16' 47.85" E
+                  </div>
+                  <div class="metric-sub-val" style="font-size: 12px; margin-top: 2px;">
+                    UTM 11S 275432 3975434
+                  </div>
+                </div>
+              </div>
+
+              <!-- Terrain Statistics Card -->
+              <div class="data-metric-card glass-panel">
+                <div class="metric-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"></path>
+                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                  </svg>
+                </div>
+                <div class="metric-card-content">
+                  <div class="metric-header-title">Terrain Statistics</div>
+                  <div style="display: flex; gap: 14px; font-size: 14px; color: var(--text-primary); font-weight: 600; margin-top: 4px;">
+                    <span>Min: <strong>1,245 m</strong></span>
+                    <span>&bull;</span>
+                    <span>Avg: <strong>1,890 m</strong></span>
+                    <span>&bull;</span>
+                    <span>Peak: <strong>2,542 m</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Coordinate Search & Export -->
+              <div class="coord-search-row">
+                <input type="text" id="coord-search-input" class="coord-search-input" placeholder="Search Lat, Lon or Landmark...">
+                <button id="coord-search-btn" class="btn-secondary" style="padding: 10px 16px;">Search</button>
+              </div>
+
+              <button id="export-summary-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 11px;">
+                Export Summary Report &darr;
+              </button>
+
+            </aside>
+
+          </div>
+
+          <!-- Bottom Full-Width Elevation Profile Graph -->
+          <div class="elevation-profile-fullcard glass-panel">
+            <div class="profile-card-header">
+              <h3>Elevation Profile</h3>
+              <div class="profile-stats-summary">
+                <div>Distance: <strong>14.6 km</strong></div>
+                <div>Elevation Gain: <strong>1,289 m</strong></div>
+              </div>
+            </div>
+
+            <!-- 2D Cross-Section Canvas -->
+            <div class="elevation-graph-canvas-wrapper">
+              <canvas id="elevation-profile-canvas"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Status Bar -->
+        <footer class="map-status-bar">
+          <div class="map-status-left">
+            <span>35&deg; 50' 35.12" N, 120&deg; 16' 47.85" E</span>
+            <span>2,134 m</span>
+          </div>
+          <div class="map-status-right">
+            <span>Map Data &copy; 2024 Aero3D</span>
+            <span>EPSG:4326</span>
+          </div>
+        </footer>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Application Logic & Engine Scripts -->
+  <script src="js/terrain-engine.js"></script>
+  <script src="js/drone-flight.js"></script>
+  <script src="js/comparison-engine.js"></script>
+  <script src="js/altitude-analytics.js"></script>
+  <script src="api-client.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
