@@ -56,6 +56,14 @@ class AltitudeAnalyticsEngine {
       this.drawTopographicMap();
       this.drawElevationProfile();
     });
+
+    window.addEventListener('flight-telemetry', (e) => {
+      const data = e.detail;
+      const currentAltElem = document.querySelector('.metric-primary-val');
+      if (currentAltElem) {
+        currentAltElem.textContent = `${data.altitudeMSL} m`;
+      }
+    });
   }
 
   drawTopographicMap() {
@@ -290,6 +298,39 @@ class AltitudeAnalyticsEngine {
         this.generateSummaryReport();
       });
     }
+
+    // --- LIVE FLIGHT TELEMETRY LISTENER (Member 5) ---
+    window.addEventListener('aero-flight-telemetry', (e) => {
+      const data = e.detail;
+
+      // 1. Update internal metrics state
+      this.metrics.currentAlt = data.altitudeMSL;
+      this.metrics.coordsLat = data.lat;
+      this.metrics.coordsLon = data.lon;
+
+      // 2. Safe DOM updates (using defensive checks so missing elements never throw)
+      const surveyAltVal = document.querySelector('.metric-primary-val');
+      if (surveyAltVal) {
+        surveyAltVal.textContent = `${data.altitudeMSL.toLocaleString()} m`;
+      }
+
+      const mslSubVal = document.querySelector('.metric-sub-val');
+      if (mslSubVal) {
+        mslSubVal.textContent = `AGL: ${data.altitudeAGL} m | Airspeed: ${data.airspeed} km/h`;
+      }
+
+      // 3. Update active position point on elevation profile
+      if (this.profileData && this.profileData.length > 5) {
+        this.profileData[5].alt = data.altitudeMSL;
+      }
+
+      // Re-draw map and profile only when Screen 5 is actually visible
+      const screen5 = document.getElementById('screen-5');
+      if (screen5 && screen5.classList.contains('active')) {
+        this.drawTopographicMap();
+        this.drawElevationProfile();
+      }
+    });
   }
 
   generateSummaryReport() {

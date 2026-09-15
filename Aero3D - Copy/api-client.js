@@ -22,13 +22,28 @@ const MOCK_DATA = {
 };
 
 class AeroApiClient {
-  static async uploadImage(file, onProgress) {
+  static async uploadImage(file) {
     if (API_CONFIG.USE_MOCK) {
-      console.log("[AeroAPI] Using local simulated mock response.");
+      console.log("[AeroAPI] Generating local preview for:", file.name);
+
+      // Create a local blob URL for instant loading without CORS issues
+      const localFileUrl = URL.createObjectURL(file);
+
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve(MOCK_DATA);
-        }, 1200);
+          resolve({
+            status: "success",
+            data: {
+              original_url: localFileUrl,
+              heightmap_url: localFileUrl, // Uses the real image luminance as elevation
+              min_alt: 1240,
+              peak_alt: 2680,
+              elevation_gain: 1440,
+              coords_lat: "35° 50' 35\" N",
+              coords_lon: "120° 16' 47\" E"
+            }
+          });
+        }, 300);
       });
     }
 
@@ -40,10 +55,7 @@ class AeroApiClient {
       body: formData
     });
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return await response.json();
   }
 }

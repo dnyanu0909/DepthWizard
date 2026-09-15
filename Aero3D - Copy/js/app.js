@@ -215,11 +215,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Drag and Drop Image Upload Simulation
   // Real Ingestion pipeline with API Client
+// --- STUDIO UPLOAD & PROCESSING PIPELINE ---
   const dropArea = document.getElementById('studio-drop-area');
   const fileInput = document.getElementById('studio-file-input');
+  const processBtn = document.getElementById('btn-process-image') || document.querySelector('.sidebar-card .btn-primary');
+  let selectedFile = null;
 
   async function handleFileProcess(file) {
     if (!file) return;
+    selectedFile = file;
+
+    // 1. Immediately update upload box UI to show preview badge
+    if (dropArea) {
+      const localPreview = URL.createObjectURL(file);
+      dropArea.innerHTML = `
+        <div class="uploaded-preview-badge" style="width: 100%; justify-content: flex-start; display: flex; align-items: center; gap: 12px; padding: 8px 12px;">
+          <img src="${localPreview}" class="preview-thumb" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;" />
+          <div style="text-align: left;">
+            <p style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin: 0;">${file.name}</p>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 2px 0 0;">${(file.size / 1024).toFixed(1)} KB • Processing...</p>
+          </div>
+        </div>
+      `;
+    }
+
     showToast(`Uploading ${file.name} to Vision Pipeline...`);
 
     try {
@@ -228,48 +247,81 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showToast("Elevation mesh generated!");
 
-      // 1. Update 3D Studio Mesh with the new heightmap
+      // 2. Load smoothed heightmap into Studio 3D view
       if (studioTerrain) {
         studioTerrain.loadHeightmapFromImage(result.heightmap_url, result.original_url);
       }
 
-      // 2. Update 2D Comparison Window images
+      // 3. Update Drone flight mesh (instantiate safely if not created yet)
+      if (!droneSim) {
+        const droneCanvas = document.getElementById('drone-canvas');
+        if (droneCanvas) {
+          droneSim = new DroneFlightSimulator('drone-canvas');
+        }
+      }
+      if (droneSim) {
+        droneSim.loadHeightmapFromImage(result.heightmap_url, result.original_url);
+      }
+
+      // 4. Update Screen 4 comparison images
       const img2D = document.getElementById('compare-img-2d');
       const img3D = document.getElementById('compare-img-3d');
       if (img2D) img2D.src = result.original_url;
       if (img3D) img3D.src = result.heightmap_url;
 
-      // 3. Update Screen 5 Telemetry cards
+      // 5. Update Screen 5 Telemetry cards
       const peakVal = document.querySelector('.metric-primary-val');
-      if (peakVal) peakVal.textContent = `${result.peak_alt} m`;
+      if (peakVal && result.peak_alt) {
+        peakVal.textContent = `${result.peak_alt.toLocaleString()} m`;
+      }
 
     } catch (err) {
-      console.error(err);
-      showToast("Upload failed. Check backend connection.");
+      console.error("[Aero3D Upload Error]", err);
+      showToast("Upload failed. Check console for details.");
     }
   }
 
+  // --- DROP ZONE & FILE INPUT LISTENERS ---
   if (dropArea && fileInput) {
     dropArea.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => handleFileProcess(e.target.files[0]));
+    
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFileProcess(e.target.files[0]);
+      }
+    });
 
     dropArea.addEventListener('dragover', (e) => {
       e.preventDefault();
       dropArea.style.borderColor = 'var(--accent-purple)';
     });
+
     dropArea.addEventListener('dragleave', () => {
       dropArea.style.borderColor = '';
     });
+
     dropArea.addEventListener('drop', (e) => {
       e.preventDefault();
       dropArea.style.borderColor = '';
-      if (e.dataTransfer.files.length > 0) {
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
         handleFileProcess(e.dataTransfer.files[0]);
       }
     });
-  } 
+  }
 
-  // Export OBJ, GLTF, GeoTIFF
+  // --- PROCESS IMAGE BUTTON ---
+  if (processBtn) {
+    processBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (selectedFile) {
+        handleFileProcess(selectedFile);
+      } else if (fileInput) {
+        fileInput.click();
+      }
+    });
+  }
+
+  // --- EXPORT CONTROLS (OBJ, GLTF, GeoTIFF) ---
   document.querySelectorAll('.btn-export').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const format = e.currentTarget.dataset.format || 'Mesh';
@@ -277,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Zoom Controls (+, ↺, -)
+  // --- ZOOM & CAMERA CONTROLS ---
   const btnZoomIn = document.getElementById('stage-zoom-in');
   const btnZoomOut = document.getElementById('stage-zoom-out');
   const btnReset = document.getElementById('stage-reset-view');

@@ -144,6 +144,75 @@ class DroneFlightSimulator {
     this.terrainMesh = new THREE.Mesh(geometry, material);
     this.scene.add(this.terrainMesh);
   }
+  
+  // Load real AI heightmap and satellite texture into drone flight terrain
+  loadHeightmapFromImage(heightmapUrl, colorTextureUrl = null) {
+    if (!this.terrainMesh) return;
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = heightmapUrl;
+
+    img.onload = () => {
+      // 1. Sample pixel values from the heightmap image
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const size = 160; // Matches the geometry resolution (160x160)
+      canvas.width = size;
+      canvas.height = size;
+      ctx.drawImage(img, 0, 0, size, size);
+
+      const imgData = ctx.getImageData(0, 0, size, size).data;
+      const geometry = this.terrainMesh.geometry;
+      const pos = geometry.attributes.position;
+      const colors = geometry.attributes.color;
+      const color = new THREE.Color();
+
+      let maxHeight = 0;
+
+      // 2. Displace mesh vertices according to heightmap pixel luminance
+      for (let i = 0; i < pos.count; i++) {
+        // Read the red channel of the grayscale heightmap (0 to 255)
+        const rawVal = imgData[i * 4] / 255.0;
+        
+        // Scale to flight altitude (0 to 140 meters)
+        const elevation = rawVal * 140;
+        pos.setY(i, elevation);
+
+        if (elevation > maxHeight) maxHeight = elevation;
+
+        // Shading based on elevation level
+        if (rawVal < 0.25) {
+          color.setHex(0x234126); // Forest / Lower Ground
+        } else if (rawVal < 0.65) {
+          color.setHex(0x5c5044); // Rocky Scree
+        } else {
+          color.setHex(0xdedbe8); // Snow / Ridge Peaks
+        }
+
+        colors.setXYZ(i, color.r, color.g, color.b);
+      }
+
+      pos.needsUpdate = true;
+      colors.needsUpdate = true;
+      geometry.computeVertexNormals();
+
+      // 3. Drape color photo if provided
+      if (colorTextureUrl) {
+        new THREE.TextureLoader().load(colorTextureUrl, (tex) => {
+          this.terrainMesh.material.map = tex;
+          this.terrainMesh.material.vertexColors = false;
+          this.terrainMesh.material.needsUpdate = true;
+        });
+      }
+
+      // 4. Reposition drone safely above highest peak to prevent collision
+      this.position.set(0, maxHeight + 45, 120);
+      this.altitudeAGL = 45;
+      this.altitudeMSL = Math.round(1800 + maxHeight);
+      this.camera.position.copy(this.position);
+    };
+  }
 
   setupKeyListeners() {
     window.addEventListener('keydown', (e) => {
@@ -232,6 +301,17 @@ class DroneFlightSimulator {
     const dt = 0.016;
     const forwardSpeed = (this.baseSpeed * this.speedMultiplier) * 0.14;
 
+   // Dispatch telemetry event for Screen 5
+    window.dispatchEvent(new CustomEvent('flight-telemetry', {
+      detail: {
+        altitudeAGL: Math.round(this.altitudeAGL),
+        altitudeMSL: Math.round(this.altitudeMSL),
+        airspeed: Math.round(this.baseSpeed * this.speedMultiplier),
+        lat: "32° 14' 20.4\" N",
+        lon: "77° 11' 18.2\" E"
+      }
+    }));
+
     // Pitch & Yaw handling
     if (this.keys.w || this.keys.ArrowUp) {
       this.pitch = Math.max(-1.1, this.pitch - 0.02);
@@ -278,6 +358,32 @@ class DroneFlightSimulator {
 
     // Update HUD telemetry
     this.updateHUD();
+
+    // --- NON-DESTRUCTIVE TELEMETRY DISPATCH (Member 5) ---
+    const now = performance.now();
+    if (!this._lastTelemetryTime || now - this._lastTelemetryTime > 100) {
+      this._lastTelemetryTime = now;
+
+      // Calculate approximate coordinates based on position offset
+      const baseLat = 32.2390;
+      const baseLon = 77.1884;
+      const currentLat = (baseLat + (this.position.z * 0.00005)).toFixed(4);
+      const currentLon = (baseLon + (this.position.x * 0.00005)).toFixed(4);
+
+      window.dispatchEvent(new CustomEvent('aero-flight-telemetry', {
+        detail: {
+          altitudeAGL: Math.round(this.altitudeAGL),
+          altitudeMSL: Math.round(this.altitudeMSL),
+          airspeed: Math.round(this.baseSpeed * this.speedMultiplier),
+          pitch: Math.round(this.pitch * (180 / Math.PI)),
+          yaw: Math.round((-this.yaw * 180 / Math.PI) % 360),
+          lat: `${currentLat}° N`,
+          lon: `${currentLon}° E`,
+          posX: this.position.x,
+          posZ: this.position.z
+        }
+      }));
+    }
   }
 
   updateHUD() {

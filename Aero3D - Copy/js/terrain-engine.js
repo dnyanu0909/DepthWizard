@@ -127,11 +127,20 @@ class TerrainEngine {
     this.heightData = data;
   }
 
+// Replace buildTerrainMesh() in terrain-engine.js
   buildTerrainMesh() {
-    if (this.mesh) {
-      this.scene.remove(this.mesh);
-      if (this.mesh.geometry) this.mesh.geometry.dispose();
-      if (this.mesh.material) this.mesh.material.dispose();
+    // 1. Properly remove and dispose the previous group to prevent ghosting
+    if (this.terrainGroup) {
+      this.scene.remove(this.terrainGroup);
+      this.terrainGroup.traverse((child) => {
+        if (child.isMesh) {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+            else child.material.dispose();
+          }
+        }
+      });
     }
 
     const size = this.gridSize;
@@ -146,10 +155,10 @@ class TerrainEngine {
 
     for (let i = 0; i < pos.count; i++) {
       const h = this.heightData[i] || 0;
-      const elevation = h * 45 * this.options.elevationScale;
+      // Controlled vertical scaling (max 28 units height)
+      const elevation = h * 28 * this.options.elevationScale;
       pos.setY(i, elevation);
 
-      // Color mapping
       this.getColorForHeight(h, color);
       colors.push(color.r, color.g, color.b);
     }
@@ -159,8 +168,8 @@ class TerrainEngine {
 
     const material = new THREE.MeshStandardMaterial({
       vertexColors: true,
-      roughness: 0.8,
-      metalness: 0.1,
+      roughness: 0.85,
+      metalness: 0.05,
       flatShading: false,
       wireframe: this.options.wireframe
     });
@@ -169,18 +178,17 @@ class TerrainEngine {
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
 
-    // Build realistic extruded bedrock / strata base sides
+    // 2. Bedrock Base
     const terrainGroup = new THREE.Group();
     terrainGroup.add(this.mesh);
 
-    // Bedrock base
-    const baseGeo = new THREE.BoxGeometry(planeWidth, 12, planeHeight);
+    const baseGeo = new THREE.BoxGeometry(planeWidth, 8, planeHeight);
     const baseMat = new THREE.MeshStandardMaterial({
-      color: 0x6e5845,
+      color: 0x5a4634,
       roughness: 0.95
     });
     const baseMesh = new THREE.Mesh(baseGeo, baseMat);
-    baseMesh.position.y = -6;
+    baseMesh.position.y = -4.1;
     terrainGroup.add(baseMesh);
 
     this.scene.add(terrainGroup);
@@ -341,21 +349,55 @@ class TerrainEngine {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = imageUrl;
+
     img.onload = () => {
+      const size = 128;
+      this.gridSize = size;
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      canvas.width = 128;
-      canvas.height = 128;
-      ctx.drawImage(img, 0, 0, 128, 128);
-      const imgData = ctx.getImageData(0, 0, 128, 128).data;
+      canvas.width = size;
+      canvas.height = size;
+      ctx.drawImage(img, 0, 0, size, size);
 
-      for (let i = 0; i < 128 * 128; i++) {
-        // Read red channel of grayscale heightmap normalized 0..1
-        this.heightData[i] = imgData[i * 4] / 255.0;
+      const raw = ctx.getImageData(0, 0, size, size).data;
+      const rawGrid = new Float32Array(size * size);
+
+      for (let i = 0; i < size * size; i++) {
+        // Luminance formula (0.299 R + 0.587 G + 0.114 B)
+        const r = raw[i * 4];
+        const g = raw[i * 4 + 1];
+        const b = raw[i * 4 + 2];
+        rawGrid[i] = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0;
       }
+
+      // --- 3x3 SMOOTHING FILTER TO ELIMINATE NEEDLE SPIKES ---
+      this.heightData = new Float32Array(size * size);
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          let sum = 0;
+          let count = 0;
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              const nx = x + dx;
+              const ny = y + dy;
+              if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
+                sum += rawGrid[ny * size + nx];
+                count++;
+              }
+            }
+          }
+          
+          // Softly taper edges toward zero so terrain fits cleanly on the bedrock block
+          const edgeDist = Math.min(x, size - 1 - x, y, size - 1 - y);
+          const edgeFade = Math.min(1.0, edgeDist / 6.0);
+
+          this.heightData[y * size + x] = (sum / count) * edgeFade;
+        }
+      }
+
       this.buildTerrainMesh();
 
-      // Optional: Drape original aerial color photo if provided
+      // Drape texture if provided
       if (colorTextureUrl && this.mesh) {
         new THREE.TextureLoader().load(colorTextureUrl, (tex) => {
           this.mesh.material.map = tex;
