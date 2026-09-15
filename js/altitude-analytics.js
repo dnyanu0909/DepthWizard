@@ -308,26 +308,38 @@ class AltitudeAnalyticsEngine {
       this.metrics.coordsLat = data.lat;
       this.metrics.coordsLon = data.lon;
 
-      // 2. Safe DOM updates (using defensive checks so missing elements never throw)
-      const surveyAltVal = document.querySelector('.metric-primary-val');
-      if (surveyAltVal) {
-        surveyAltVal.textContent = `${data.altitudeMSL.toLocaleString()} m`;
+      // 2. Target specific cards by ID (NO FLINCHING)
+      const altVal = document.getElementById('metric-altitude-val');
+      const altSub = document.getElementById('metric-altitude-sub');
+      const coordsVal = document.getElementById('metric-coords-val');
+
+      if (altVal) {
+        // Formatted consistently with no jumping
+        altVal.textContent = `${Number(data.altitudeMSL).toLocaleString()} m`;
       }
 
-      const mslSubVal = document.querySelector('.metric-sub-val');
-      if (mslSubVal) {
-        mslSubVal.textContent = `AGL: ${data.altitudeAGL} m | Airspeed: ${data.airspeed} km/h`;
+      if (altSub) {
+        altSub.textContent = `AGL: ${data.altitudeAGL} m • Speed: ${data.airspeed} km/h`;
       }
 
-      // 3. Update active position point on elevation profile
+      if (coordsVal && data.lat && data.lon) {
+        coordsVal.textContent = `${data.lat}   ${data.lon}`;
+      }
+
+      // 3. Update the summit pin tooltip on the topographic map
+      const pinBubble = document.querySelector('.pin-bubble');
+      if (pinBubble) {
+        pinBubble.textContent = `${Number(data.altitudeMSL).toLocaleString()} m`;
+      }
+
+      // 4. Update elevation profile curve point smoothly
       if (this.profileData && this.profileData.length > 5) {
         this.profileData[5].alt = data.altitudeMSL;
       }
 
-      // Re-draw map and profile only when Screen 5 is actually visible
+      // Redraw only when Screen 5 is active
       const screen5 = document.getElementById('screen-5');
       if (screen5 && screen5.classList.contains('active')) {
-        this.drawTopographicMap();
         this.drawElevationProfile();
       }
     });
@@ -359,7 +371,7 @@ DATA INTEGRITY:
   Horizontal Resolution: 0.5m GSD
   Vertical Accuracy: ±0.35m RMSE
 =====================================================
-Aero3D Cartographic Analytics Engine © 2024`;
+Aero3D Cartographic Analytics Engine`;
 
     const blob = new Blob([reportText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -372,5 +384,6 @@ Aero3D Cartographic Analytics Engine © 2024`;
     URL.revokeObjectURL(url);
   }
 }
+
 
 window.AltitudeAnalyticsEngine = AltitudeAnalyticsEngine;

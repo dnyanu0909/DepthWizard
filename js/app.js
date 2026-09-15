@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     urban: {
       time: '412 ms',
       vertices: '2.10M Vertices',
-      img2d: 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=1400&q=80', // Dubai / Coastal Grid
+      img2d: 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=1400&q=80', // Direct top-down urban grid orthophoto
       img3d: 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=1400&q=80'
     },
     river: {

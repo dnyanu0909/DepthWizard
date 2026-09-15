@@ -793,76 +793,46 @@
             <!-- Analytical Side Panel (40%) -->
             <aside class="map-analytical-panel">
               
-              <!-- Location Card -->
-              <div class="data-metric-card glass-panel">
-                <div class="metric-card-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
-                </div>
-                <div class="metric-card-content">
-                  <div class="metric-header-title">Location</div>
-                  <div class="metric-primary-val" style="font-size: 20px;">Alpine Ridge</div>
-                  <div class="metric-sub-val">Rocky Mountains &bull; Colorado, USA</div>
-                </div>
-              </div>
+              <!-- Card 1: Location -->
+        <div class="data-metric-card glass-panel">
+          <div class="metric-card-icon">📍</div>
+          <div class="metric-card-content">
+            <div class="metric-header-title">Location</div>
+            <div class="metric-primary-val" id="metric-location-name" style="font-size: 20px;">Alpine Ridge</div>
+            <div class="metric-sub-val" id="metric-location-sub">Colorado Rocky Mountains, Sector 4</div>
+          </div>
+        </div>
 
-              <!-- Altitude Card -->
-              <div class="data-metric-card glass-panel">
-                <div class="metric-card-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M8 3l4 8 5-5 5 15H2L8 3z"></path>
-                  </svg>
-                </div>
-                <div class="metric-card-content">
-                  <div class="metric-header-title">Altitude</div>
-                  <div class="metric-primary-val">2,134 m</div>
-                  <div class="metric-sub-val">7,001 ft ASL</div>
-                </div>
-              </div>
+        <!-- Card 2: Live Drone Altitude -->
+        <div class="data-metric-card glass-panel">
+          <div class="metric-card-icon">⛰️</div>
+          <div class="metric-card-content">
+            <div class="metric-header-title">Survey Altitude</div>
+            <div class="metric-primary-val" id="metric-altitude-val">2,134 m</div>
+            <div class="metric-sub-val" id="metric-altitude-sub">AGL: 45 m • Speed: 54 km/h</div>
+          </div>
+        </div>
 
-              <!-- Coordinates Card -->
-              <div class="data-metric-card glass-panel">
-                <div class="metric-card-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="22" y1="12" x2="18" y2="12"></line>
-                    <line x1="6" y1="12" x2="2" y2="12"></line>
-                    <line x1="12" y1="6" x2="12" y2="2"></line>
-                    <line x1="12" y1="22" x2="12" y2="18"></line>
-                  </svg>
-                </div>
-                <div class="metric-card-content">
-                  <div class="metric-header-title">Coordinates</div>
-                  <div style="font-size: 15px; font-weight: 700; color: var(--text-primary);">
-                    35&deg; 50' 35.12" N &nbsp; 120&deg; 16' 47.85" E
-                  </div>
-                  <div class="metric-sub-val" style="font-size: 12px; margin-top: 2px;">
-                    UTM 11S 275432 3975434
-                  </div>
-                </div>
-              </div>
+        <!-- Card 3: Live Coordinates -->
+        <div class="data-metric-card glass-panel">
+          <div class="metric-card-icon">🧭</div>
+          <div class="metric-card-content">
+            <div class="metric-header-title">Coordinates</div>
+            <div class="metric-primary-val" id="metric-coords-val" style="font-size: 18px;">35° 50' 35" N  120° 16' 47" E</div>
+            <div class="metric-sub-val" id="metric-coords-utm">UTM 11S 275432 3975434</div>
+          </div>
+        </div>
 
-              <!-- Terrain Statistics Card -->
-              <div class="data-metric-card glass-panel">
-                <div class="metric-card-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 3v18h18"></path>
-                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
-                  </svg>
-                </div>
-                <div class="metric-card-content">
-                  <div class="metric-header-title">Terrain Statistics</div>
-                  <div style="display: flex; gap: 14px; font-size: 14px; color: var(--text-primary); font-weight: 600; margin-top: 4px;">
-                    <span>Min: <strong>1,245 m</strong></span>
-                    <span>&bull;</span>
-                    <span>Avg: <strong>1,890 m</strong></span>
-                    <span>&bull;</span>
-                    <span>Peak: <strong>2,542 m</strong></span>
-                  </div>
-                </div>
-              </div>
+        <!-- Card 4: Terrain Statistics -->
+        <div class="data-metric-card glass-panel">
+          <div class="metric-card-icon">📊</div>
+          <div class="metric-card-content">
+            <div class="metric-header-title">Terrain Statistics</div>
+            <div class="metric-sub-val" id="metric-stats-val" style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 6px;">
+              Min: 1,245 m &nbsp;•&nbsp; Avg: 1,890 m &nbsp;•&nbsp; Peak: 2,542 m
+            </div>
+          </div>
+        </div>
 
               <!-- Coordinate Search & Export -->
               <div class="coord-search-row">
